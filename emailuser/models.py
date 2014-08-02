@@ -9,7 +9,7 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin, SiteProfileNotAvailable,
 )
 
-
+from unidecode import unidecode
 
 class EmailUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -67,14 +67,18 @@ class EmailUser(AbstractBaseUser, PermissionsMixin):
         #abstract = True,cc
 
     def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.username)
+        return "/users/%s/" % urlquote(self.email)
 
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = u'{} {}'.format(self.first_name, self.last_name)
         return full_name.strip()
+
+    @property
+    def get_ascii_full_name(self):
+        return u'{} {}'.format(unidecode(self.first_name),unidecode(self.last_name))
 
     def get_short_name(self):
         "Returns the short name for the user."
